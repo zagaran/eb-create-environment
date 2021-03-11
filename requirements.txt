@@ -1,0 +1,6 @@
+awsebcli
+boto3
+choicesenum
+ipython
+jedi==0.17.2
+pyyaml
