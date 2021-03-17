@@ -6,3 +6,6 @@ __pycache__
 build/
 dist/
 *.egg-info/
+
+# Don't include the .elasticbeanstak config files generated in testing
+.elasticbeanstalk/
