@@ -65,7 +65,8 @@ class SetupWrapper(object):
         self.db_only = args.db_only
         self.dir_path = os.path.dirname(os.path.realpath(__file__))
         self.config_file_path = args.config or os.path.join(self.dir_path, DEFAULT_CONFIG_FILE_PATH)
-        #self.create_new_application = False
+        # TODO: add support for application creation
+        # self.create_new_application = False
         self.get_eb_config()
 
     def setup(self):

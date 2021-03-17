@@ -1,11 +1,12 @@
 import time
-from datetime import timedelta, datetime
-
 import boto3
+
+from datetime import timedelta, datetime
 from botocore.exceptions import ParamValidationError
 from choicesenum import ChoicesEnum
-
 from eb_create_environment.utils import generate_secure_password
+from eb_create_environment.vpc import VPCAccessor
+
 
 BASE_PARAMS = [
     'AllocatedStorage',
@@ -138,16 +139,19 @@ class DatabaseInitializer(object):
 
     def create_db(self):
         vpc_security_groups = [self.create_db_security_group()]
+        db_subnet_group = self.get_db_subnet_group()
+        if not db_subnet_group:
+            db_subnet_group = self.create_db_subnet_group()
         try:
             params = dict(
                 DBInstanceIdentifier=self.db_name,
                 MasterUserPassword=self.password,
                 # DBSecurityGroups=db_security_groups,
                 VpcSecurityGroupIds=vpc_security_groups,
-                # DBSubnetGroupName=self.vpc_subnet,  # TODO: this
+                DBSubnetGroupName=db_subnet_group,
                 **self.get_config_params(),
             )
-            response = self.client.create_db_instance(**params)
+            self.client.create_db_instance(**params)
         except ParamValidationError:
             print(self.get_config_params())
             raise
@@ -193,12 +197,24 @@ class DatabaseInitializer(object):
             time.sleep(10)
         return host
 
-    def get_subnet_groups_from_vpc(self, vpc_id):
+    def get_db_subnet_group(self):
         response = self.client.describe_db_subnet_groups()
         if 'DBSubnetGroups' in response:
-            return [
+            vpc_subnet_groups = [
                 subnet_group['DBSubnetGroupName'] for subnet_group in response['DBSubnetGroups']
-                if subnet_group['VpcId'] == vpc_id
+                if subnet_group['VpcId'] == self.vpc_id
             ]
-        else:
-            return []
+            if vpc_subnet_groups:
+                return vpc_subnet_groups[0]
+        return None
+    
+    def create_db_subnet_group(self):
+        vpc = VPCAccessor(self.region)
+        subnet_ids = list(vpc.get_subnets(self.vpc_id))
+        subnet_group_name = f"default-{self.vpc_id}"
+        self.client.create_db_subnet_group(
+            DBSubnetGroupName=subnet_group_name,
+            DBSubnetGroupDescription=f"All subnets for {self.vpc_id}",
+            SubnetIds=subnet_ids,
+        )
+        return subnet_group_name
