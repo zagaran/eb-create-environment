@@ -34,7 +34,7 @@ RDS:
   DeletionProtection: False
   MaxAllocatedStorage: 1000
   Postgres:
-    DBName: "postgres"
+    DBName: "ebdb"
     Engine: "postgres"
     EngineVersion: "12.5"
     Port: 5432
