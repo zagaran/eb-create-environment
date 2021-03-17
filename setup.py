@@ -17,7 +17,7 @@ setuptools.setup(
     entry_points={
         "console_scripts": ["eb-create-environment=eb_create_environment.script:main"],
     },
-    install_requires=["awsebcli", "boto3", "choicesenum", "ipython", "jedi", "pyyaml"],
+    install_requires=["boto3", "choicesenum", "ipython", "jedi", "pyyaml"],
     keywords="aws eb elastic beanstalk rds database create environment",
     license="MIT",
     long_description=README,
