@@ -9,6 +9,7 @@ ElasticBeanstalk:
   InstancePublicSubnets: True
   # Omit the load balancer block to have it be not load balanced
   LoadBalancer:
+    LoadBalancerType: "application"
     SSLCertificateId: null
     ELBScheme: "public"  # public, private
     MinSize: "1"

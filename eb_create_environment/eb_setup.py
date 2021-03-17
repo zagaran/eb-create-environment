@@ -66,11 +66,12 @@ class EBInitializer(object):
             ("aws:ec2:vpc", "VPCId"): self.vpc_id,
             ("aws:ec2:vpc", "ELBSubnets"): ",".join(load_balancer_subnets),
             ("aws:ec2:vpc", "Subnets"): ",".join(instance_subnets),
-            ("aws:ec2:vpc", "AssociatePublicIpAddress"): "True" if self.get_config_param("AssociatePublicIpAddress") else "False",
+            ("aws:ec2:vpc", "AssociatePublicIpAddress"): "true" if self.get_config_param("AssociatePublicIpAddress") else "false",
         }
         
         if self.get_config_param("LoadBalancer"):
             options[("aws:elasticbeanstalk:environment", "EnvironmentType")] = "LoadBalanced"
+            options[("aws:elasticbeanstalk:environment", "LoadBalancerType")] = str(self.get_config_param("LoadBalancer", "LoadBalancerType"))
             options[("aws:elb:loadbalancer", "LoadBalancerHTTPPort")] = "80"
             options[("aws:autoscaling:asg", "MinSize")] = str(self.get_config_param("LoadBalancer", "MinSize"))
             options[("aws:autoscaling:asg", "MaxSize")] = str(self.get_config_param("LoadBalancer", "MaxSize"))
@@ -81,12 +82,12 @@ class EBInitializer(object):
             options[("aws:elasticbeanstalk:environment", "EnvironmentType")] = "SingleInstance"
         
         if self.get_config_param("ManagedUpdates"):
-            options[("aws:elasticbeanstalk:managedactions", "ManagedActionsEnabled")] = "True"
+            options[("aws:elasticbeanstalk:managedactions", "ManagedActionsEnabled")] = "true"
             options[("aws:elasticbeanstalk:managedactions", "PreferredStartTime")] = self.get_config_param("ManagedUpdates", "PreferredStartTime")
             options[("aws:elasticbeanstalk:managedactions", "ServiceRoleForManagedUpdates")] = self.get_config_param("ManagedUpdates", "ServiceRoleForManagedUpdates")
             options[("aws:elasticbeanstalk:managedactions:platformupdate", "UpdateLevel")] = self.get_config_param("ManagedUpdates", "UpdateLevel")
         else:
-            options[("aws:elasticbeanstalk:managedactions", "ManagedActionsEnabled")] = "True"
+            options[("aws:elasticbeanstalk:managedactions", "ManagedActionsEnabled")] = "false"
         
         if self.get_config_param("LoadBalancer") and self.get_config_param("LoadBalancer", "SSLCertificateId"):
             options[("aws:elb:loadbalancer", "LoadBalancerHTTPSPort")] = "443"

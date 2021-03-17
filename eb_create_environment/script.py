@@ -49,6 +49,12 @@ class SetupWrapper(object):
             help="Skip setup of application and environment. Requires application and environment to exist already."
         )
         parser.add_argument(
+            "--no-db",
+            default=False,
+            action="store_true",
+            help="Skip setup of the database.  Cannot be used with `--db-only`"
+        )
+        parser.add_argument(
             "--print-default-config",
             default=False,
             action="store_true",
@@ -63,6 +69,9 @@ class SetupWrapper(object):
         self.environment_name = args.environment_name
         self.region = args.region
         self.db_only = args.db_only
+        self.no_db = args.no_db
+        if self.db_only and self.no_db:
+            raise Exception("--db-only cannot be used with --no-db")
         self.dir_path = os.path.dirname(os.path.realpath(__file__))
         self.config_file_path = args.config or os.path.join(self.dir_path, DEFAULT_CONFIG_FILE_PATH)
         # TODO: add support for application creation
@@ -98,6 +107,9 @@ class SetupWrapper(object):
             print("\nWaiting for EB environment to finish launching")
         application_security_group_id = eb_initializer.wait_for_environment()
         print("\nEB environment ready")
+        
+        if self.no_db:
+            return
         
         # Call rds setup
         engine = Engine.postgres
