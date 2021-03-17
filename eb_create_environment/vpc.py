@@ -15,8 +15,10 @@ class VPCAccessor(object):
             vpcs[vpc.id] = None
             if vpc.is_default:
                 vpcs[vpc.id] = "Default"
-            if vpc.tags and vpc.tags.get("Name"):
-                vpcs[vpc.id] = vpc.tags.get("Name")
+            if vpc.tags:
+                name_tags = [tag["Value"] for tag in vpc.tags if tag["Key"] == "Name"]
+                if name_tags:
+                    vpcs[vpc.id] = name_tags[0]
         return vpcs
     
     def get_subnets(self, vpc_id, public=True):
@@ -31,6 +33,8 @@ class VPCAccessor(object):
         route_tables = ec2_resources.route_tables.all()
         main_route_table_public = False
         for route_table in route_tables:
+            if route_table.vpc.id != vpc_id:
+                continue
             is_public = self.is_route_table_public(route_table)
             for association in route_table.associations:
                 if association.main:
