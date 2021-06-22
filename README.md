@@ -4,6 +4,9 @@ Tired of byzantine EB environment and RDS instance creation workflows? Use this 
 environments and linked RDS instances simply, without having to rely on the AWS interface. The tool ships with sensible
 defaults, which may be overridden if desired.
 
+# Instalation
+`pip install eb-create-environment`
+
 # Usage
 ```
 usage: eb-create-environment [-h] [-c CONFIG] [-a APPLICATION_NAME]
