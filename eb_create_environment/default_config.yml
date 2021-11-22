@@ -38,7 +38,7 @@ RDS:
   Postgres:
     DBName: "ebdb"
     Engine: "postgres"
-    EngineVersion: "12.5"
+    EngineVersion: "13.4"
     Port: 5432
-    DBParameterGroupName: "default.postgres12"
+    DBParameterGroupName: "default.postgres13"
     LicenseModel: "postgresql-license"

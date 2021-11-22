@@ -21,11 +21,15 @@ class VPCAccessor(object):
                     vpcs[vpc.id] = name_tags[0]
         return vpcs
     
-    def get_subnets(self, vpc_id, public=True):
+    def get_subnets(self, vpc_id, public=True, instance_type=None):
         ec2_resources = self.get_ec2_resources()
         vpc = ec2_resources.Vpc(vpc_id)
+        if instance_type:
+            supported_subnets = self.get_subnets_for_instance_type(instance_type)
         subnets = {}
         for subnet in vpc.subnets.all():
+            if instance_type and subnet.availability_zone not in supported_subnets:
+                continue
             subnets[subnet.id] = subnet.availability_zone
         public_subnets = {}
         private_subnets = {}
@@ -41,9 +45,9 @@ class VPCAccessor(object):
                     main_route_table_public = is_public
                 if association.subnet:
                     if is_public:
-                        public_subnets[association.subnet.id] = subnets.pop(association.subnet.id)
+                        public_subnets[association.subnet.id] = subnets.pop(association.subnet.id, None)
                     else:
-                        private_subnets[association.subnet.id] = subnets.pop(association.subnet.id)
+                        private_subnets[association.subnet.id] = subnets.pop(association.subnet.id, None)
         if main_route_table_public:
             public_subnets.update(subnets)
         else:
@@ -56,3 +60,8 @@ class VPCAccessor(object):
     
     def is_route_table_public(self, route_table):
         return any(ra.get('DestinationCidrBlock') == '0.0.0.0/0' and ra.get('GatewayId') is not None for ra in route_table.routes_attribute)
+    
+    def get_subnets_for_instance_type(self, instance_type):
+        client = boto3.client("ec2", self.region)
+        ret = client.describe_instance_type_offerings(LocationType="availability-zone", Filters=[{"Name": "instance-type", "Values": [instance_type]}])
+        return [i["Location"] for i in ret["InstanceTypeOfferings"]]

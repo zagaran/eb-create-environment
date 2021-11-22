@@ -173,7 +173,7 @@ class DatabaseInitializer(object):
         }
 
     def get_db_url(self, user, host, port):
-        postgres_db_name = self.config["Postgres"]["DBName"]
+        postgres_db_name = self.config["RDS"]["Postgres"]["DBName"]
         if self.engine == Engine.postgres:
             return f"postgres://{user}:{self.password}@{host}:{port}/{postgres_db_name}?sslmode=require"
         else:
