@@ -28,5 +28,5 @@ setuptools.setup(
     include_package_data=True,
     python_requires='>=3.6',
     url="https://github.com/zagaran/eb-environment-creation",
-    version="0.0.2",
+    version="0.0.3",
 )
