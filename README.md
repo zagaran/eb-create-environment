@@ -33,8 +33,7 @@ optional arguments:
                         Print default config and exit
 
 ```
-* `eb-create-environment` reads configuration by default from `eb_create_environment.default_config.yml`.
-    Override default configs by create=ing a custom config yaml file and specify its path using the `--config` option.
+* Override default configs by createing a custom config yaml file and specify its path using the `--config` option (see [Customizing the config file](#customizing-the-config-file))
 * Print defaults with the `--print-default-config` option
 * Elastic beanstalk configuration (application name, authentication profile name, default region) are read from the 
   `.elasticbeanstalk/config.yml` file if it exists. Otherwise, the user will be prompted for these values and the 
@@ -45,3 +44,11 @@ optional arguments:
 * If `--db-only` is not selected, `eb-create-environment` will create an EB environment with the specified parameters,
   create a database in the same VPC, create the necessary security groups, and set the `DATABASE_URL` environment
   variable on the EB environment.
+
+## Customizing the config file
+
+The default config file is [`eb_create_environment.default_config.yml`](eb_create_environment/default_config.yml).  `eb-create-environment` will use this file as it's config file if no `--config` option is passed.
+
+Override default configs by copying this file, modifying its values, and specifying its path using the `--config` option.
+
+Params under the `ElasticBeanstalk` top-level key are used in [eb_create_environment/eb_setup.py](eb_create_environment/eb_setup.py) while params under the `RDS` top-level key are used in [eb_create_environment/database.py](eb_create_environment/database.py).
