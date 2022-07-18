@@ -1,4 +1,5 @@
 import boto3
+import fnmatch
 from choicesenum import ChoicesEnum
 from eb_create_environment.vpc import VPCAccessor
 from botocore.exceptions import ParamValidationError
@@ -47,7 +48,7 @@ class EBInitializer(object):
             raise Exception(f"invalid server tier: {self.server_tier}")
         
         vpc_accessor = VPCAccessor(self.region)
-        instance_subnets = vpc_accessor.get_subnets(self.vpc_id, self.get_config_param("InstancePublicSubnets"))
+        instance_subnets = vpc_accessor.get_subnets(self.vpc_id, self.get_config_param("InstancePublicSubnets"), instance_type=self.get_config_param("InstanceTypes"))
         if not instance_subnets:
             raise Exception("No valid subnets for instances")
         print(f"Using the following subnets for instances: {instance_subnets}")
@@ -57,6 +58,18 @@ class EBInitializer(object):
             if not load_balancer_subnets:
                 raise Exception("No valid subnets for the load balancer")
             print(f"Using the following subnets for the load balancer: {load_balancer_subnets}")
+        
+        eb_client = self.get_eb_client()
+        
+        solution_stack_name = self.get_config_param("SolutionStackName")
+        if "*" in solution_stack_name:
+            resp = eb_client.list_available_solution_stacks()
+            available_stacks = fnmatch.filter(resp["SolutionStacks"], solution_stack_name)
+            if not available_stacks:
+                raise Exception(f"No solution stacks match the provided pattern `{solution_stack_name}`")
+            # Take the newest; according to Boto3 docks, solution stacks are listed with newest first
+            solution_stack_name = available_stacks[0]
+            print(f"Using solution stack: {solution_stack_name}")
         
         options = {
             ("aws:elasticbeanstalk:container:python", "NumProcesses"): str(self.get_config_param("NumProcesses")),
@@ -93,7 +106,6 @@ class EBInitializer(object):
             options[("aws:elb:loadbalancer", "LoadBalancerHTTPSPort")] = "443"
             options[("aws:elb:loadbalancer", "SSLCertificateId")] = self.get_config_param("LoadBalancer", "SSLCertificateId")
         
-        eb_client = self.get_eb_client()
         # Note that we don't pass VersionLabel to intentionally deploy the sample app
         option_settings = [{"Namespace": key[0], "OptionName": key[1], "Value": value} for key, value in options.items()]
         try:
@@ -102,7 +114,7 @@ class EBInitializer(object):
                 EnvironmentName=self.environment_name,
                 CNAMEPrefix=self.cname_prefix,
                 Tier=tier_config,
-                SolutionStackName=self.get_config_param("SolutionStackName"),
+                SolutionStackName=solution_stack_name,
                 OptionSettings=option_settings,
             )
         except ParamValidationError:
