@@ -47,8 +47,8 @@ optional arguments:
 
 ## Customizing the config file
 
-The default config file is [`eb_create_environment.default_config.yml`](eb_create_environment/default_config.yml).  `eb-create-environment` will use this file as it's config file if no `--config` option is passed.
+The default config file is [`eb_create_environment/default_config.yml`](eb_create_environment/default_config.yml).  `eb-create-environment` will use this file as it's config file if no `--config` option is passed.
 
-Override default configs by copying this file, modifying its values, and specifying its path using the `--config` option.
+You can override this default by copying this file, modifying its values, and specifying its path using the `--config` option.  It is recommended that you include these files in your codebase in a directory called `.elasticbeanstalk`.
 
 Params under the `ElasticBeanstalk` top-level key are used in [eb_create_environment/eb_setup.py](eb_create_environment/eb_setup.py) while params under the `RDS` top-level key are used in [eb_create_environment/database.py](eb_create_environment/database.py).
