@@ -221,8 +221,7 @@ class SetupWrapper(object):
 
     def print_default_config(self):
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), DEFAULT_CONFIG_FILE_PATH)) as default_config_file:
-            for line in default_config_file:
-                print(line)
+            print(default_config_file.read())
 
 
 def main():
