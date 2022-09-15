@@ -1,7 +1,6 @@
 import time
 import boto3
 
-from datetime import timedelta, datetime
 from botocore.exceptions import ParamValidationError
 from choicesenum import ChoicesEnum
 from eb_create_environment.utils import generate_secure_password
@@ -155,8 +154,8 @@ class DatabaseInitializer(object):
         except ParamValidationError:
             print(self.get_config_params())
             raise
-        host = self.get_host_from_response()
         print("Waiting for Database")
+        host = self.get_host_from_response()
         return self.get_db_url(params['MasterUsername'], host, params['Port'])
 
     def get_config_params(self):
@@ -180,23 +179,16 @@ class DatabaseInitializer(object):
             return ""
 
     def get_host_from_response(self):
-        timeout = timedelta(minutes=15)
-        start = datetime.now()
-        host = ""
-        while True:
-            if datetime.now() > start + timeout:
-                break
+        host = None
+        for _ in range(100):
             response = self.client.describe_db_instances()
             for db in response['DBInstances']:
                 if db['DBInstanceIdentifier'] == self.db_name:
-                    try:
-                        host = db['Endpoint']['Address'] or ""
-                    except:
-                        pass
+                    host = db.get('Endpoint', {}).get('Address')
             if host:
-                break
+                return host
             time.sleep(10)
-        return host
+        raise Exception(f"Database not ready after 15 minutes")
 
     def get_db_subnet_group(self):
         response = self.client.describe_db_subnet_groups()
