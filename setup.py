@@ -1,6 +1,7 @@
 import os
 import setuptools
 
+from eb_create_environment._version import __version__
 
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
     README = readme.read()
@@ -28,5 +29,5 @@ setuptools.setup(
     include_package_data=True,
     python_requires='>=3.6',
     url="https://github.com/zagaran/eb-environment-creation",
-    version="0.0.5",
+    version=__version__,
 )

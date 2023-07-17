@@ -1,5 +1,6 @@
 import time
 import boto3
+import fnmatch
 
 from botocore.exceptions import ParamValidationError
 from choicesenum import ChoicesEnum
@@ -166,10 +167,19 @@ class DatabaseInitializer(object):
         engine_params = {
             param: self.config['RDS'][config_engine_name][param] for param in PARAMS_BY_ENGINE[self.engine]
         }
+        engine_version = engine_params.get("EngineVersion")
+        if "*" in engine_version:
+            engine_params["EngineVersion"] = self.get_engine_version(engine_version)
         return {
             **base_params,
             **engine_params,
         }
+
+    def get_engine_version(self, version_string):
+        ret = self.client.describe_db_engine_versions(Engine="postgres")
+        engine_versions = [i["EngineVersion"] for i in ret["DBEngineVersions"]]
+        engine_versions = fnmatch.filter(engine_versions, version_string)
+        return max(engine_versions)
 
     def get_db_url(self, user, host, port):
         postgres_db_name = self.config["RDS"]["Postgres"]["DBName"]
