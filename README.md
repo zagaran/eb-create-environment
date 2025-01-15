@@ -1,4 +1,4 @@
-# eb-environment-creation
+# eb-create-environment
 
 Tired of byzantine EB environment and RDS instance creation workflows? Use this tool to set up Elastic Beanstalk 
 environments and linked RDS instances simply, without having to rely on the AWS interface. The tool ships with sensible
