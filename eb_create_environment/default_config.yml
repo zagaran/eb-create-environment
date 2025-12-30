@@ -2,9 +2,9 @@
 ElasticBeanstalk:
   # aws elasticbeanstalk list-available-solution-stacks --region us-east-1
   # SolutionStackName can have `*`, in which case it will use the latest matching stack (using Python fnmatch for matching)
-  SolutionStackName: "64bit Amazon Linux 2 * running Python 3.8"
+  SolutionStackName: "64bit Amazon Linux 2023 * Python 3.11"
   NumProcesses: "1"
-  InstanceTypes: "t3.micro"
+  InstanceTypes: "t3.small"
   IamInstanceProfile: "aws-elasticbeanstalk-ec2-role"
   AssociatePublicIpAddress: True
   ProxyServer: "apache"  # apache, nginx
@@ -39,7 +39,7 @@ RDS:
   Postgres:
     DBName: "ebdb"
     Engine: "postgres"
-    EngineVersion: "15.*"
+    EngineVersion: "17.*"
     Port: 5432
-    DBParameterGroupName: "default.postgres15"
+    DBParameterGroupName: "default.postgres17"
     LicenseModel: "postgresql-license"

@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=61.2", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eb-create-environment"
+version = "0.2.0"
+authors = [{name = "Zagaran, Inc.", email = "info@zagaran.com"}]
+license = "MIT"
+description = "Tool to create an Elastic Beanstalk environment and linked database using sensible defaults"
+keywords = [
+    "aws",
+    "eb",
+    "elastic",
+    "beanstalk",
+    "rds",
+    "database",
+    "create",
+    "environment",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "boto3",
+    "choicesenum",
+    "ipython",
+    "jedi",
+    "pyyaml",
+]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.urls]
+Homepage = "https://github.com/zagaran/eb-environment-creation"
+
+[project.scripts]
+eb-create-environment = "eb_create_environment.script:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages]
+find = {namespaces = false}
+
+[tool.setuptools.package-data]
+eb_create_environemnt = ["default_config.yml"]

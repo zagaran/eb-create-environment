@@ -4,7 +4,7 @@ import os
 import sys
 import yaml
 
-from eb_create_environment._version import __version__
+import importlib.metadata
 from eb_create_environment.database import DatabaseInitializer, Engine
 from eb_create_environment.eb_setup import EBInitializer
 from eb_create_environment.vpc import VPCAccessor
@@ -17,11 +17,12 @@ EB_GLOBAL_CONFIG_FILE_PATH = os.path.join(EB_GLOBAL_CONFIG_DIRECTORY, "config.ym
 
 class SetupWrapper(object):
     def __init__(self):
+        version = importlib.metadata.version("eb_create_environment")
         parser = argparse.ArgumentParser(description="Set up linked EB and RDS instances")
         parser.add_argument(
             "--version",
             action="version",
-            version=f"%(prog)s {__version__}"
+            version=f"%(prog)s {version}"
         )
         parser.add_argument(
             "-c", "--config",
